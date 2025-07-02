@@ -1,0 +1,43 @@
+MSP430 Assembly Listing with Macro Expansions
+============================================================
+Line	Address	Label		Opcode		Operand		Object Code
+--------------------------------------------------------------------------------
+68	C000			SET_PORT_BITS P1DIR, ALL_BITS	; Invoke SET_PORT_BITS macro.
+68				    bis.b   #ALL_BITS, &P1DIR         ; Belirtilen bitleri set et (TI style)
+
+77	C000			STR_3 "as", "I", "am"	; Invoke STR_3 macro.
+77				.string "as", "I", "am"
+
+81	C000			ADD3 R5, R6, R7	; Invoke ADD3 macro.
+81				    mov     R5, TEMP_REG          ; İlk parametreyi TEMP_REG'e yükle (TI style)
+81				    add     R6, TEMP_REG          ; İkinci parametreyi ekle (TI style)
+81				    add     R7, TEMP_REG          ; Üçüncü parametreyi ekle (TI style)
+
+89	C000			DELAY_MS 100	; Invoke DELAY_MS macro.
+89				    .eval 100 * 250 / 1000, cycles ; Döngü sayısını hesapla
+89				    mov     #cycles, R15         ; Sayacı yükle
+89				_LOCAL_DELAY_MS_4_1delay_loop:
+89				    dec     R15                  ; Sayacı azalt
+89				    jnz     _LOCAL_DELAY_MS_4_1delay_loop         ; Sıfır değilse devam et
+
+101	C000			STR_3 "test", "macro", "again"	; Invoke STR_3 macro.
+101				.string "test", "macro", "again"
+
+C000		mov.w	#__STACK_END, SP	40310400
+C004		mov.w	#WDTPW | WDTHOLD, &WDTCTL	40B05A800120
+C008		bis.b	#ALL_BITS, &P1DIR	D0B000000022
+C00C		mov.w	#5, R5	40350005
+C010		mov.w	#7, R6	40360007
+C014		mov.w	#3, R7	40370003
+C026		mov	R5, TEMP_REG	4580
+C02A		add	R6, TEMP_REG	5680
+C02E		add	R7, TEMP_REG	5780
+C032		mov.b	TEMP_REG, &LED_PORT	40D0
+C036		mov	#cycles, R15	403F0000
+C03A		dec	R15	831F
+C03E		jnz	_LOCAL_DELAY_MS_4_1delay_loop	2010
+C042		xor.b	#0x01, &P1OUT	E0C0
+C046		mov.w	#MAX_COUNT, R8	40380000
+C04A		dec	R8	8318
+C04E		jnz	forever_loop	2010
+C069		jmp	forever_loop	3C10

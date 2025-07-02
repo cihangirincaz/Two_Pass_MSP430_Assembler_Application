@@ -1,0 +1,43 @@
+29	STR_3	.macro	P1, P2, P3
+30			.string ":p1:", ":p2:", ":p3:"
+31		.endm
+
+34	ADD3	.macro	a, b, c
+35			    mov     a, TEMP_REG          ; İlk parametreyi TEMP_REG'e yükle (TI style)
+36			    add     b, TEMP_REG          ; İkinci parametreyi ekle (TI style)
+37			    add     c, TEMP_REG          ; Üçüncü parametreyi ekle (TI style)
+38		.endm
+
+41	SET_PORT_BITS	.macro	port, bits
+42			    bis.b   #bits, &port         ; Belirtilen bitleri set et (TI style)
+43		.endm
+
+46	DELAY_MS	.macro	duration
+47			    .eval duration * 250 / 1000, cycles ; Döngü sayısını hesapla
+48			    mov     #cycles, R15         ; Sayacı yükle
+49			??delay_loop:
+50			    dec     R15                  ; Sayacı azalt
+51			    jnz     ??delay_loop         ; Sıfır değilse devam et
+52		.endm
+
+68	C000	SET_PORT_BITS P1DIR, ALL_BITS	; Invoke SET_PORT_BITS macro.
+68			    bis.b   #ALL_BITS, &P1DIR         ; Belirtilen bitleri set et (TI style)
+
+77	C000	STR_3 "as", "I", "am"	; Invoke STR_3 macro.
+77			.string "as", "I", "am"
+
+81	C000	ADD3 R5, R6, R7	; Invoke ADD3 macro.
+81			    mov     R5, TEMP_REG          ; İlk parametreyi TEMP_REG'e yükle (TI style)
+81			    add     R6, TEMP_REG          ; İkinci parametreyi ekle (TI style)
+81			    add     R7, TEMP_REG          ; Üçüncü parametreyi ekle (TI style)
+
+89	C000	DELAY_MS 100	; Invoke DELAY_MS macro.
+89			    .eval 100 * 250 / 1000, cycles ; Döngü sayısını hesapla
+89			    mov     #cycles, R15         ; Sayacı yükle
+89			_LOCAL_DELAY_MS_4_1delay_loop:
+89			    dec     R15                  ; Sayacı azalt
+89			    jnz     _LOCAL_DELAY_MS_4_1delay_loop         ; Sıfır değilse devam et
+
+101	C000	STR_3 "test", "macro", "again"	; Invoke STR_3 macro.
+101			.string "test", "macro", "again"
+

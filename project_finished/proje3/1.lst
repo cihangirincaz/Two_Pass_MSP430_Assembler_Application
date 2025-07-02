@@ -1,0 +1,46 @@
+MSP430 Assembly Listing with Macro Expansions
+============================================================
+Line	Address	Label		Opcode		Operand		Object Code
+--------------------------------------------------------------------------------
+41	C000			INIT_WDT 	; Invoke INIT_WDT macro.
+41				    mov.w   #WDTPW|WDTHOLD, &WDTCTL     ; Watchdog'u durdur
+
+42	C000			INIT_GPIO 	; Invoke INIT_GPIO macro.
+42				    bis.b   #01h, &P1DIR                 ; P1.0'ı output yap (LED)
+42				    bic.b   #01h, &P1OUT                 ; LED'i söndür
+
+46	C000			TOGGLE_LED 	; Invoke TOGGLE_LED macro.
+46				    xor.b   #01h, &P1OUT                 ; P1.0 LED'ini toggle et
+
+47	C000			DELAY_LOOP DELAY_COUNT	; Invoke DELAY_LOOP macro.
+47				    mov.w   #DELAY_COUNT, R15                 ; Delay counter'ı R15'e yükle
+47				delay_loop:
+47				    dec.w   R15                          ; Counter'ı azalt
+47				    jnz     delay_loop                   ; Sıfır değilse devam et
+
+52	C000			SET_LED 01h	; Invoke SET_LED macro.
+52				    mov.b   #01h, &P1OUT               ; LED 01h'ini ayarla
+
+53	C000			DELAY_LOOP 10000	; Invoke DELAY_LOOP macro.
+53				    mov.w   #10000, R15                 ; Delay counter'ı R15'e yükle
+53				delay_loop:
+53				    dec.w   R15                          ; Counter'ı azalt
+53				    jnz     delay_loop                   ; Sıfır değilse devam et
+
+54	C000			SET_LED 00h	; Invoke SET_LED macro.
+54				    mov.b   #00h, &P1OUT               ; LED 00h'ini ayarla
+
+C000		mov.w	#__STACK_END, SP	40310400
+C004		mov.w	#WDTPW|WDTHOLD, &WDTCTL	40B05A800120
+C008		bis.b	#01h, &P1DIR	D0B000000022
+C00C		bic.b	#01h, &P1OUT	C0C0
+C010		jmp	main	3C10
+C014		xor.b	#01h, &P1OUT	E0C0
+C018		mov.w	#DELAY_COUNT, R15	403F0000
+C01C		jnz	delay_loop	2010
+C020		jmp	main	3C10
+C024		mov.b	#01h, &P1OUT	40C0
+C028		mov.w	#10000, R15	403F2710
+C02C		jnz	delay_loop	2010
+C030		mov.b	#00h, &P1OUT	40C0
+C034		ret		4130

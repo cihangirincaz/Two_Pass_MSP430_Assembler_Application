@@ -1,0 +1,52 @@
+10	INIT_WDT	.macro	
+11			    mov.w   #WDTPW|WDTHOLD, &WDTCTL     ; Watchdog'u durdur
+12		.endm
+
+14	INIT_GPIO	.macro	
+15			    bis.b   #01h, &P1DIR                 ; P1.0'ı output yap (LED)
+16			    bic.b   #01h, &P1OUT                 ; LED'i söndür
+17		.endm
+
+19	DELAY_LOOP	.macro	cycles
+20			    mov.w   #cycles, R15                 ; Delay counter'ı R15'e yükle
+21			delay_loop:
+22			    dec.w   R15                          ; Counter'ı azalt
+23			    jnz     delay_loop                   ; Sıfır değilse devam et
+24		.endm
+
+26	TOGGLE_LED	.macro	
+27			    xor.b   #01h, &P1OUT                 ; P1.0 LED'ini toggle et
+28		.endm
+
+30	SET_LED	.macro	state
+31			    mov.b   #state, &P1OUT               ; LED state'ini ayarla
+32		.endm
+
+41	C000	INIT_WDT 	; Invoke INIT_WDT macro.
+41			    mov.w   #WDTPW|WDTHOLD, &WDTCTL     ; Watchdog'u durdur
+
+42	C000	INIT_GPIO 	; Invoke INIT_GPIO macro.
+42			    bis.b   #01h, &P1DIR                 ; P1.0'ı output yap (LED)
+42			    bic.b   #01h, &P1OUT                 ; LED'i söndür
+
+46	C000	TOGGLE_LED 	; Invoke TOGGLE_LED macro.
+46			    xor.b   #01h, &P1OUT                 ; P1.0 LED'ini toggle et
+
+47	C000	DELAY_LOOP DELAY_COUNT	; Invoke DELAY_LOOP macro.
+47			    mov.w   #DELAY_COUNT, R15                 ; Delay counter'ı R15'e yükle
+47			delay_loop:
+47			    dec.w   R15                          ; Counter'ı azalt
+47			    jnz     delay_loop                   ; Sıfır değilse devam et
+
+52	C000	SET_LED 01h	; Invoke SET_LED macro.
+52			    mov.b   #01h, &P1OUT               ; LED 01h'ini ayarla
+
+53	C000	DELAY_LOOP 10000	; Invoke DELAY_LOOP macro.
+53			    mov.w   #10000, R15                 ; Delay counter'ı R15'e yükle
+53			delay_loop:
+53			    dec.w   R15                          ; Counter'ı azalt
+53			    jnz     delay_loop                   ; Sıfır değilse devam et
+
+54	C000	SET_LED 00h	; Invoke SET_LED macro.
+54			    mov.b   #00h, &P1OUT               ; LED 00h'ini ayarla
+

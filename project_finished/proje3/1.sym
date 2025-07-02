@@ -1,0 +1,47 @@
+MSP430 Symbol Table
+============================================================
+Symbol		Value		Type		Segment		Scope
+----------------------------------------------------------------------
+LED		0x0001		Constant		.const		global
+LED_GREEN		0x0040		Constant		.const		global
+LED_RED		0x0001		Constant		.const		global
+NMI_VECTOR		0xFFFC		Constant		.const		global
+P1DIR		0x0022		Register		.const		global
+P1IE		0x0025		Constant		.const		global
+P1IES		0x0024		Constant		.const		global
+P1IFG		0x0023		Constant		.const		global
+P1IN		0x0020		Register		.const		global
+P1OUT		0x0021		Register		.const		global
+P1REN		0x0027		Constant		.const		global
+P1SEL		0x0026		Constant		.const		global
+P1SEL2		0x0041		Constant		.const		global
+P2DIR		0x002A		Register		.const		global
+P2IE		0x002D		Constant		.const		global
+P2IES		0x002C		Constant		.const		global
+P2IFG		0x002B		Constant		.const		global
+P2IN		0x0028		Register		.const		global
+P2OUT		0x0029		Register		.const		global
+P2REN		0x002F		Constant		.const		global
+P2SEL		0x002E		Constant		.const		global
+P2SEL2		0x0042		Constant		.const		global
+RESET		0xC000		Function		text		global
+RESET_VECTOR		0xFFFE		Constant		.const		global
+WDTCTL		0x0120		Constant		.const		global
+WDTHOLD		0x0080		Constant		.const		global
+WDTPW		0x5A00		Constant		.const		global
+__STACK_END		0x0400		Constant		.const		global
+buffer		0xC046		Label		bss		local
+counter		0xC040		Label		data		local
+main		0xC00A		Function		text		global
+message		0xC03E		Label		data		local
+status		0xC044		Label		data		local
+temp_var		0xC046		Label		bss		local
+
+
+Macro Definitions
+------------------------------
+INIT_WDT		-		Macro		.macro		local
+INIT_GPIO		-		Macro		.macro		local
+DELAY_LOOP		-		Macro		.macro		local
+TOGGLE_LED		-		Macro		.macro		local
+SET_LED		-		Macro		.macro		local

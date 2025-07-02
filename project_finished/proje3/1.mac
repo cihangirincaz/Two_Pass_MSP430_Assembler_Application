@@ -1,0 +1,83 @@
+MACRO TABLE
+============================================================
+Name		Parameters		Definition Line		Calls
+------------------------------------------------------------
+INIT_WDT		()		10		1
+INIT_GPIO		()		14		1
+DELAY_LOOP		(cycles)		19		2
+TOGGLE_LED		()		26		1
+SET_LED		(state)		30		2
+
+
+Macro Expansions
+========================================
+Expansion #1:
+  Macro: INIT_WDT
+  Arguments: 
+  Line: 41
+  Address: 0xC000 - 0xC000
+  Original: INIT_WDT 
+  Expanded:
+        mov.w   #WDTPW|WDTHOLD, &WDTCTL     ; Watchdog'u durdur
+
+Expansion #2:
+  Macro: INIT_GPIO
+  Arguments: 
+  Line: 42
+  Address: 0xC000 - 0xC000
+  Original: INIT_GPIO 
+  Expanded:
+        bis.b   #01h, &P1DIR                 ; P1.0'ı output yap (LED)
+        bic.b   #01h, &P1OUT                 ; LED'i söndür
+
+Expansion #3:
+  Macro: TOGGLE_LED
+  Arguments: 
+  Line: 46
+  Address: 0xC000 - 0xC000
+  Original: TOGGLE_LED 
+  Expanded:
+        xor.b   #01h, &P1OUT                 ; P1.0 LED'ini toggle et
+
+Expansion #4:
+  Macro: DELAY_LOOP
+  Arguments: DELAY_COUNT
+  Line: 47
+  Address: 0xC000 - 0xC000
+  Original: DELAY_LOOP DELAY_COUNT
+  Expanded:
+        mov.w   #DELAY_COUNT, R15                 ; Delay counter'ı R15'e yükle
+    delay_loop:
+        dec.w   R15                          ; Counter'ı azalt
+        jnz     delay_loop                   ; Sıfır değilse devam et
+
+Expansion #5:
+  Macro: SET_LED
+  Arguments: 01h
+  Line: 52
+  Address: 0xC000 - 0xC000
+  Original: SET_LED 01h
+  Expanded:
+        mov.b   #01h, &P1OUT               ; LED 01h'ini ayarla
+
+Expansion #6:
+  Macro: DELAY_LOOP
+  Arguments: 10000
+  Line: 53
+  Address: 0xC000 - 0xC000
+  Original: DELAY_LOOP 10000
+  Expanded:
+        mov.w   #10000, R15                 ; Delay counter'ı R15'e yükle
+    delay_loop:
+        dec.w   R15                          ; Counter'ı azalt
+        jnz     delay_loop                   ; Sıfır değilse devam et
+
+Expansion #7:
+  Macro: SET_LED
+  Arguments: 00h
+  Line: 54
+  Address: 0xC000 - 0xC000
+  Original: SET_LED 00h
+  Expanded:
+        mov.b   #00h, &P1OUT               ; LED 00h'ini ayarla
+

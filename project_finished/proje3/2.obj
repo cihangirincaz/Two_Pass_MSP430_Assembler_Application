@@ -1,0 +1,97 @@
+ELF Object File Format
+==================================================
+
+FILE HEADER:
+  Magic:     ELF
+  Class:     ELF32
+  Data:      LSB (Little Endian)
+  Version:   1
+  OS/ABI:    SYSV
+  Machine:   MSP430
+  Type:      REL (Relocatable file)
+  Entry:     0x00000000
+  Created:   Sat Jun 14 16:48:07 2025
+  Assembler: MSP430-Assembler-v1.0
+
+SECTION HEADERS:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  ------------------------------------------------------------------------------
+  [ 0]                  NULL           00000000 000000 000000 00      0   0  0
+  [ 1] .text            PROGBITS       00000000 000040 000038 00  AX  0   0  2
+  [ 2] .reset           PROGBITS       0000fffe 000078 000002 00  AX  0   0  2
+  [ 3] .stack           NOBITS         00000000 00007a 000200 00  WA  0   0  1
+  [ 4] .data            PROGBITS       00000000 00007a 000000 00  WA  0   0  1
+  [ 5] .bss             NOBITS         00000000 00007a 000000 00  WA  0   0  1
+  [ 6] .strings         PROGBITS       00000000 00007a 000019 00      0   0  1
+  [ 7] .symtab          SYMTAB         00000000 000093 000070 10      8   1  4
+  [ 8] .strtab          STRTAB         00000000 000103 00002c 00      0   0  1
+  [ 9] .shstrtab        STRTAB         00000000 00012f 000040 00      0   0  1
+
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  p (processor specific)
+
+SYMBOL TABLE:
+  [Nr]    Value  Size Type    Bind   Vis      Ndx Name
+  ------------------------------------------------------------
+  [  0] 00000000    0 NOTYPE  LOCAL  DEFAULT UND 
+  [  1] 00000120    2 OBJECT  GLOBAL DEFAULT ABS WDTCTL
+  [  2] 00000022    2 OBJECT  GLOBAL DEFAULT ABS P1DIR
+  [  3] 00000021    2 OBJECT  GLOBAL DEFAULT ABS P1OUT
+  [  4] 00000400    2 OBJECT  GLOBAL DEFAULT ABS __STACK_END
+  [  5] 0000c000    8 FUNC    GLOBAL DEFAULT 1   RESET
+  [  6] 0000c00a    8 FUNC    GLOBAL DEFAULT 1   main
+
+RELOCATION RECORDS FOR [.text]:
+  Offset   Info     Type              Symbol's Value  Symbol's Name
+  ----------------------------------------------------------------------
+  00000008 00000001 R_MSP430_16      000000000000120 WDTCTL
+  0000000c 00000002 R_MSP430_16      000000000000022 P1DIR
+
+SECTION CONTENTS:
+
+Contents of section .text:
+  0000 40 31 04 00                                    
+  0004 40 B0 5A 80 01 20                              
+  000a D0 B0 00 00 00 22                              
+  0010 40 35 00 05                                    
+  0014 40 36 00 07                                    
+  0018 40 37 00 03                                    
+  001c 45 80                                          
+  001e 56 80                                          
+  0020 57 80                                          
+  0022 40 D0                                          
+  0024 40 3F 00 00                                    
+  0028 83 1F                                          
+  002a 20 10                                          
+  002c E0 C0                                          
+  002e 40 38 00 00                                    
+  0032 83 18                                          
+  0034 20 10                                          
+  0036 3C 10                                          
+
+Contents of section .reset:
+  fffe 00 C0                                    
+
+Contents of section .strings:
+  0000 61 73 00 49 00 61 6d 00 74 65 73 74 00 6d 61 63 as.I.am.test.mac
+  0010 72 6f 00 61 67 61 69 6e 00                      ro.again.
+
+ASSEMBLY LISTING:
+  Address  Label      Opcode     Operand          Object Code
+  -----------------------------------------------------------------
+  C000		mov.w	#__STACK_END, SP	40310400
+  C004		mov.w	#WDTPW | WDTHOLD, &WDTCTL	40B05A800120
+  C008		bis.b	#ALL_BITS, &P1DIR	D0B000000022
+  C00C		mov.w	#5, R5	40350005
+  C010		mov.w	#7, R6	40360007
+  C014		mov.w	#3, R7	40370003
+  C026		mov	R5, TEMP_REG	4580
+  C02A		add	R6, TEMP_REG	5680
+  C02E		add	R7, TEMP_REG	5780
+  C032		mov.b	TEMP_REG, &LED_PORT	40D0
+  ... (8 more lines)
+
+End of ELF object file.

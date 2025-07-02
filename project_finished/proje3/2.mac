@@ -1,0 +1,74 @@
+MACRO TABLE
+============================================================
+Name		Parameters		Definition Line		Calls
+------------------------------------------------------------
+STR_3		(P1, P2, P3)		29		2
+ADD3		(a, b, c)		34		1
+SET_PORT_BITS		(port, bits)		41		1
+DELAY_MS		(duration)		46		1
+
+ASSIGNMENTS (.asg)
+------------------------------
+TEMP_REG              ; TEMP_REG artık R4 anlamına gelir	= R4
+MAX_COUNT            ; Sayısal sabit tanımla	= 100
+LED_PORT           ; Port tanımla	= P1OUT
+ALL_BITS            ; Bit mask tanımla	= 0xFF
+RESULT               ; RESULT = 15	= 15
+DELAY_COUNT           ; DELAY_COUNT = 250	= 250
+BUFFER_SIZE        ; BUFFER_SIZE = 64	= 64
+cycles ; Döngü sayısını hesapla	= 25
+
+
+Macro Expansions
+========================================
+Expansion #1:
+  Macro: SET_PORT_BITS
+  Arguments: P1DIR, ALL_BITS
+  Line: 68
+  Address: 0xC000 - 0xC000
+  Original: SET_PORT_BITS P1DIR, ALL_BITS
+  Expanded:
+        bis.b   #ALL_BITS, &P1DIR         ; Belirtilen bitleri set et (TI style)
+
+Expansion #2:
+  Macro: STR_3
+  Arguments: "as", "I", "am"
+  Line: 77
+  Address: 0xC000 - 0xC000
+  Original: STR_3 "as", "I", "am"
+  Expanded:
+    .string "as", "I", "am"
+
+Expansion #3:
+  Macro: ADD3
+  Arguments: R5, R6, R7
+  Line: 81
+  Address: 0xC000 - 0xC000
+  Original: ADD3 R5, R6, R7
+  Expanded:
+        mov     R5, TEMP_REG          ; İlk parametreyi TEMP_REG'e yükle (TI style)
+        add     R6, TEMP_REG          ; İkinci parametreyi ekle (TI style)
+        add     R7, TEMP_REG          ; Üçüncü parametreyi ekle (TI style)
+
+Expansion #4:
+  Macro: DELAY_MS
+  Arguments: 100
+  Line: 89
+  Address: 0xC000 - 0xC000
+  Original: DELAY_MS 100
+  Expanded:
+        .eval 100 * 250 / 1000, cycles ; Döngü sayısını hesapla
+        mov     #cycles, R15         ; Sayacı yükle
+    _LOCAL_DELAY_MS_4_1delay_loop:
+        dec     R15                  ; Sayacı azalt
+        jnz     _LOCAL_DELAY_MS_4_1delay_loop         ; Sıfır değilse devam et
+
+Expansion #5:
+  Macro: STR_3
+  Arguments: "test", "macro", "again"
+  Line: 101
+  Address: 0xC000 - 0xC000
+  Original: STR_3 "test", "macro", "again"
+  Expanded:
+    .string "test", "macro", "again"
+

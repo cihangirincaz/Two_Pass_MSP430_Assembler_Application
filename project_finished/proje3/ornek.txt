@@ -1,0 +1,256 @@
+.text                       ; Kod bölümü başlangıcı
+.org 0x4000                 ; 0x4000 adresinden başla
+
+start:
+    mov.w   #my_value, R5   ; my_value'u R5'e yükle
+    mov.w   #my_long, R6    ; my_long adresini R6'ya yükle
+    jmp     $               ; Sonsuz döngü
+
+.org 0x4200                 ; Veri bölümü için yeni adres
+my_value:   .word 0x1234    ; 16-bit değer (2 byte)
+my_long:    .long 0x12345678 ; 32-bit değer (4 byte)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+; LongIntAddition.asm
+; Function: Adds two 32-bit values in decimal (BCD) and binary form
+; Author: A. Milenkovic
+
+.cdecls C,LIST,"msp430.h"        ; Include device header
+
+.def RESET                       ; Export program entry point
+
+.text                            ; Code section
+.retain                          ; Retain section
+.retainrefs                      ; Retain referenced sections
+
+; --------- Constants in Flash (read-only) ----------
+lint1:  .long 0x45678923
+lint2:  .long 0x23456789
+
+; --------- RAM Allocation (.bss section) -----------
+lsumd:  .usect ".bss", 4, 2       ; 4 bytes for BCD sum
+lsumi:  .usect ".bss", 4, 2       ; 4 bytes for integer sum
+
+; --------- Program Start ---------------------------
+RESET:
+        mov.w   #__STACK_END, SP         ; Initialize stack
+StopWDT:
+        mov.w   #WDTPW|WDTHOLD, &WDTCTL  ; Stop Watchdog Timer
+
+        clr.w   R2                       ; Clear status register
+
+        ; BCD Addition
+        mov.w   lint1, R8
+        dadd.w  lint2, R8
+        mov.w   R8, lsumd
+
+        mov.w   lint1+2, R8
+        dadd.w  lint2+2, R8
+        mov.w   R8, lsumd+2
+
+        ; Binary Addition
+        mov.w   lint1, R8
+        add.w   lint2, R8
+        mov.w   R8, lsumi
+
+        mov.w   lint1+2, R8
+        addc.w  lint2+2, R8
+        mov.w   R8, lsumi+2
+
+        jmp     $                       ; Infinite loop
+
+; --------- Stack Section ---------------------------
+.global __STACK_END
+.sect   .stack
+
+; --------- Interrupt Vector Table ------------------
+.sect ".reset"
+.short RESET
+
+
+
+
+
+
+
+
+; LongIntAddition.asm
+; Function: Adds two 32-bit values in decimal (BCD) and binary form
+; Author: A. Milenkovic
+
+.cdecls C,LIST,"msp430.h"        ; Include device header
+
+.def RESET                       ; Export program entry point
+
+.text                            ; Code section
+.retain                          ; Retain section
+.retainrefs                      ; Retain referenced sections
+
+; --------- Constants in Flash (read-only) ----------
+lint1:  .long 0x45678923
+lint2:  .long 0x23456789
+
+; --------- RAM Allocation (.bss section) -----------
+lsumd:  .usect ".bss", 4, 2       ; 4 bytes for BCD sum
+lsumi:  .usect ".bss", 4, 2       ; 4 bytes for integer sum
+
+; --------- Program Start ---------------------------
+RESET:
+        mov.w   #__STACK_END, SP         ; Initialize stack
+        mov.w   #WDTPW|WDTHOLD, &WDTCTL  ; Stop Watchdog Timer
+
+        clr.w   R2                       ; Clear status register
+
+        ; BCD Addition
+        mov.w   lint1, R8
+        dadd.w  lint2, R8
+        mov.w   R8, lsumd
+
+        mov.w   lint1+2, R8
+        dadd.w  lint2+2, R8
+        mov.w   R8, lsumd+2
+
+        ; Binary Addition
+        mov.w   lint1, R8
+        add.w   lint2, R8
+        mov.w   R8, lsumi
+
+        mov.w   lint1+2, R8
+        addc.w  lint2+2, R8
+        mov.w   R8, lsumi+2
+
+        jmp     $                       ; Infinite loop
+
+; --------- Stack Section ---------------------------
+.global __STACK_END
+.sect   .stack
+
+; --------- Interrupt Vector Table ------------------
+.sect ".reset"
+.short RESET
+
+
+
+
+
+
+; Lab4_D1.asm (CPE 325 Lab4 Demo code)
+; Function: Counts the number of characters 'E' in a given string
+; Description: Program traverses an input array of characters
+; to detect the character 'E'; exits when a NULL is detected
+; Input : The input string is specified in myStr
+; Output : The port P1OUT displays the number of 'E's in the string
+; Author : A. Milenkovic, milenkovic@computer.org
+; Date : August 14, 2008
+
+.cdecls C,LIST,"msp430.h"         ; Include device header file
+
+.def RESET                        ; Export program entry-point to linker
+
+; -------- Constants and Data --------
+myStr: .string "HELLO WORLD, I AM THE MSP430!", ''
+
+; -------- Program Start ------------
+.text
+.retain                          ; Retain section
+.retainrefs                      ; Retain referenced sections
+
+RESET:
+    mov.w   #__STACK_END, SP      ; Initialize stack pointer
+    mov.w   #WDTPW|WDTHOLD, &WDTCTL ; Stop watchdog timer
+
+; -------- Main loop --------
+main:
+    bis.b   #0xFF, &P1DIR         ; Configure P1.x as output
+    mov.w   #myStr, R4           ; Load the starting address of the string into R4
+    clr.b   R5                    ; Register R5 will serve as a counter
+
+gnext:
+    mov.b   @R4+, R6             ; Get a new character
+    cmp     #0, R6               ; Check if it is a null character
+    jeq     lend                 ; If null, jump to end
+    cmp.b   #'E', R6             ; Is it the character 'E'?
+    jne     gnext                ; If not, go to the next character
+    inc.w   R5                   ; If yes, increment the counter
+    jmp     gnext                ; Go to the next character
+
+lend:
+    mov.b   R5, &P1OUT           ; Display the result (number of 'E's)
+    bis.w   #LPM4, SR            ; Enter Low Power Mode 4 (LPM4)
+    nop                           ; Required only for Debugger
+
+; -------- Stack Pointer and Interrupt Vectors --------
+.global __STACK_END
+.sect   .stack
+
+.sect ".reset"                   ; MSP430 RESET Vector
+.short RESET
+.end
+
+
+
+
+
+
+; ========================
+; Semboller (equ / set)
+; ========================
+BUF_SIZE  .equ  16
+VAL       .set  0x1A2B
+
+; ========================
+; Kod alanı
+; ========================
+.text
+.org 0xF800
+
+START:
+    MOV #BUF_SIZE, R4     ; Immediate (constant)
+    MOV #VAL, R5          ; Immediate (set ile tanımlı)
+    MOV #'A', R6          ; Char literal
+    MOV &data_value, R7   ; Symbolic indirgeme
+    ADD 4(R4), R5         ; Indexed adresleme
+    MOV @R6, R7           ; Indirect
+    MOV @R7+, R8          ; Auto-increment
+    JMP NEXT              ; Jump format
+    .float 3.14           ; 4 byte float veri
+    .string "HELLO"       ; String + null byte
+
+NEXT:
+    NOP
+    RETI
+
+; ========================
+; Veri alanı (.data)
+; ========================
+.data
+.org 0x2000
+
+data_value:  .word 0xABCD, 0x1234   ; Hex literal
+binary_val:  .word 0b10101010       ; Binary literal
+octal_val:   .word 123Q             ; Octal literal
+char_val:    .byte 'Z'              ; Char literal
+hex_h_val:   .byte 5Ah              ; Hex (with H)
+          ; Negatif float
+
+; ========================
+; Bellek ayırma (.bss)
+; ========================
+.bss
+.org 0x3000
+
+temp_buffer:  .space BUF_SIZE       ; Sabit uzunlukta alan
+scratch_area: .resw 4               ; 4 kelime (8 byte)
